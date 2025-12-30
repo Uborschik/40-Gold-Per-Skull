@@ -19,6 +19,12 @@ namespace Game.Unity.Combat.Views
         [SerializeField] private TileBase groundTile;
         [SerializeField] private TileBase selectionTile;
 
+        [SerializeField] private HighlightView highlightView;
+        [SerializeField] private SelectionView selectionView;
+
+        public HighlightView HighlightView => highlightView;
+        public SelectionView SelectionView => selectionView;
+
         public void PaintGrid()
         {
             for (int y = 0; y < cellRegistry.Height; y++)

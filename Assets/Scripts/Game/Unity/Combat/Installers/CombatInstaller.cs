@@ -53,6 +53,9 @@ namespace Game.Unity.Combat.Installers
             builder.RegisterComponentInNewPrefab(gridViewPrefab, Lifetime.Scoped)
                .AsSelf().AsImplementedInterfaces();
 
+            builder.Register(r => r.Resolve<GridView>().HighlightView, Lifetime.Scoped);
+            builder.Register(r => r.Resolve<GridView>().SelectionView, Lifetime.Scoped);
+
             builder.RegisterComponentInNewPrefab(hoverObjectView, Lifetime.Scoped)
                .AsSelf().AsImplementedInterfaces();
 
