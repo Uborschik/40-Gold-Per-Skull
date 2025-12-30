@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Project Path="VContainer.Editor.csproj" />
+  <Project Path="Game.Core.csproj" />
+  <Project Path="VContainer.csproj" />
+  <Project Path="UniTask.csproj" />
+  <Project Path="UniTask.Linq.csproj" />
+  <Project Path="Game.Unity.csproj" />
+  <Project Path="UniTask.Addressables.csproj" />
+  <Project Path="UniTask.TextMeshPro.csproj" />
+  <Project Path="UniTask.DOTween.csproj" />
+  <Project Path="UniTask.Editor.csproj" />
+</Solution>

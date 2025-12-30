@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e269a0757132f0c4d9ffe6aa8fd30467, type: 3}
+  m_Name: GridViewSettings
+  m_EditorClassIdentifier: Game.Unity::GameUnity.Settings.GridViewSettings
+  WalkableTile: {fileID: 11400000, guid: 0bac500eb21e8af468da635d9c115aaa, type: 2}
+  BlockedTile: {fileID: 11400000, guid: 318995c41fac40c409ecc0e9ff7f335f, type: 2}
