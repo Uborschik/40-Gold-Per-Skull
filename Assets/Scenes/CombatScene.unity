@@ -375,8 +375,10 @@ MonoBehaviour:
   autoInjectGameObjects: []
   setupAsset: {fileID: 11400000, guid: f83e38e4444820d40b42671e1a9ed215, type: 2}
   mainCamera: {fileID: 519420031}
-  gridViewPrefab: {fileID: 6066267002336986326, guid: 27f7d9d540b34664181437ef413455cb, type: 3}
-  hoverObjectView: {fileID: 4242289051250635284, guid: 0d8718ebf1ba034499e071995fe890ee, type: 3}
+  gridViewPrefab: {fileID: 6983601551132945312, guid: 27f7d9d540b34664181437ef413455cb, type: 3}
+  highlightView: {fileID: 1027539565128807841, guid: beaf4466a3286c340847edd125ee1795, type: 3}
+  cellSelectionView: {fileID: 3356593965296301241, guid: 86a6e3ecda4bbb84a93f42aeddc0c1b5, type: 3}
+  unitSelectionView: {fileID: 552408848648685928, guid: d7d2b4e8c36ade84e87b2c7ee6d256fc, type: 3}
 --- !u!4 &1048211727
 Transform:
   m_ObjectHideFlags: 0
