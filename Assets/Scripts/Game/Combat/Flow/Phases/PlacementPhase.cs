@@ -56,6 +56,7 @@ namespace Game.Combat.Phases
                 {
                     cellRegistry.TrySetBlocked(selectedUnit.Position.ToInt(), false);
                     cellRegistry.TrySetBlocked(position, true);
+                    type = SelectionType.Unit;
                 }
             }
 
