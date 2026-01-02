@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Game.Unity.Input
+namespace Game.Combat.Input
 {
     public class InputService
     {

@@ -9,9 +9,9 @@ namespace Game.Combat.Entities.Units
     {
         private SpriteRenderer spriteRenderer;
 
-        public Stats Stats { get; }
+        public Stats Stats { get; private set; }
         public Team Team { get; private set; }
-        public Vector2Int Position { get; private set; }
+        public Vector2 Position => transform.position;
         public bool IsAlive { get; private set; } = true;
 
         private void Awake()
@@ -19,13 +19,15 @@ namespace Game.Combat.Entities.Units
             spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
-        public void SetTeam(Team team) => Team = team;
-        public void SetPosition(Vector2Int position) => Position = position;
-        public void SetIsAlive(bool isAlive) => IsAlive = isAlive;
-
-        internal void Initialize()
+        public void Initialize(Stats stats, Team team, Vector2 position)
         {
-            throw new NotImplementedException();
+            Stats = stats;
+            Team = team;
+            transform.position = position;
         }
+
+        public void SetTeam(Team team) => Team = team;
+        public void SetPosition(Vector2 position) => transform.position = position;
+        public void SetIsAlive(bool isAlive) => IsAlive = isAlive;
     }
 }

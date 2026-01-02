@@ -1,11 +1,10 @@
 ﻿using Game.Combat.Entities.Units;
-using Game.Core.Combat.Setup;
 using System;
 
-namespace Game.Unity.Combat.Setup
+namespace Game.Combat.Setup
 {
     [Serializable]
-    public class UnitDeployerData
+    public class UnitFactoryData
     {
         public TeamData[] TeamData;
         public Unit Prefab;

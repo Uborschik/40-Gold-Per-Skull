@@ -1,21 +1,16 @@
-﻿using Game.Core.Combat.Setup;
+﻿using Game.Combat.Entities.Grid;
 using UnityEngine;
 
 namespace Game.Combat.Grid
 {
     public class CellRegistry
     {
-        private readonly GridCell[,] grid;
+        private GridCell[,] grid;
+        public GridCell[,] Grid => grid;
         public int Width => grid.GetLength(0);
         public int Height => grid.GetLength(1);
 
-        public CellRegistry(GridData data)
-        {
-            grid = new GridCell[data.GridWidth, data.GridHeight];
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
-                    grid[x, y] = new GridCell(x, y);
-        }
+        public void AddGrid(GridCell[,] grid) => this.grid = grid;
 
         public GridCell GetCell(Vector2Int pos) =>
             IsValid(pos) ? grid[pos.x, pos.y] : null;

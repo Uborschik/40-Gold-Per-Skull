@@ -1,4 +1,5 @@
 ﻿using Game.Combat.Entities.Units;
+using Game.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -46,6 +47,18 @@ namespace Game.Combat.Units
                 if (teamUnits.Count == 0)
                     teamMap.Remove(unit.Team);
             }
+
+            return true;
+        }
+
+        public bool TryMoveUnit(Unit unit, Vector2Int to)
+        {
+            if (unit.Position == to) return false;
+            if (unitMap.TryGetValue(to, out _)) return false;
+
+            unitMap.Remove(unit.Position.ToInt());
+            unitMap[to] = unit;
+            unit.SetPosition(to.ToCenter());
 
             return true;
         }

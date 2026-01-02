@@ -1,10 +1,14 @@
-﻿using Game.Combat.Views;
-using Game.Core.Combat.Setup;
+﻿using Game.Combat.Entities.Factories;
+using Game.Combat.Entities.Grid;
+using Game.Combat.Entities.Selector;
+using Game.Combat.Flow;
+using Game.Combat.Grid;
+using Game.Combat.Input;
+using Game.Combat.Phases;
+using Game.Combat.Setup;
+using Game.Combat.TurnOrder;
+using Game.Combat.Units;
 using Game.Core.Combat.TurnOrder;
-using Game.Unity.Combat.Setup;
-using Game.Unity.Combat.Views;
-using Game.Unity.Input;
-using System;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -17,23 +21,33 @@ namespace Game.Unity.Combat.Installers
         [SerializeField] private CombatSetupAsset setupAsset;
         [SerializeField] private Camera mainCamera;
 
-        [Header("Prefabs")]
-        [SerializeField] private GridView gridViewPrefab;
-        [SerializeField] private HighlightView highlightView;
-        [SerializeField] private CellSelectionView cellSelectionView;
-        [SerializeField] private UnitSelectionView unitSelectionView;
-
         protected override void Configure(IContainerBuilder builder)
         {
-            var validator = new CombatSetupValidator();
-            var errors = validator.Validate(setupAsset.GridData, setupAsset.DeployerData.TeamData);
+            builder.Register<InputActions>(Lifetime.Singleton);
+            builder.Register<InputService>(Lifetime.Scoped)
+                .WithParameter(mainCamera);
 
-            if (errors.Count > 0)
-            {
-                var errorMessage = $"CombatSetup validation failed:\n{string.Join("\n", errors)}";
-                Debug.LogError(errorMessage);
-                throw new InvalidOperationException(errorMessage);
-            }
+            builder.Register<CellRegistry>(Lifetime.Scoped);
+            builder.Register<UnitRegistry>(Lifetime.Scoped);
+
+            builder.Register<CellFactory>(Lifetime.Scoped)
+                .WithParameter(setupAsset.GridData);
+            builder.Register<UnitFactory>(Lifetime.Scoped)
+                .WithParameter(setupAsset.UnitFactoryData);
+
+            builder.RegisterComponentInHierarchy<GridView>();
+            builder.Register<Selector>(Lifetime.Scoped);
+
+            builder.Register<PlacementPhase>(Lifetime.Scoped)
+                .WithParameter(setupAsset.GridData.PlacementArea);
+            builder.Register<CombatPhase>(Lifetime.Scoped);
+            builder.Register<CombatFlow>(Lifetime.Scoped);
+
+            builder.Register<IRandomProvider, SystemRandomProvider>(Lifetime.Scoped);
+            builder.Register<InitiativeRoller>(Lifetime.Scoped);
+            builder.Register<TurnQueue>(Lifetime.Scoped);
+
+            builder.RegisterEntryPoint<CombatSceneLifetime>(Lifetime.Scoped);
         }
     }
 }

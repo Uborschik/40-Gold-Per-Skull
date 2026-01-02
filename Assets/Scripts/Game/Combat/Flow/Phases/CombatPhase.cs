@@ -1,6 +1,8 @@
-﻿using Game.Combat.Entities.Units;
+﻿using Game.Combat.Entities.Selector;
+using Game.Combat.Entities.Units;
 using Game.Combat.TurnOrder;
 using Game.Combat.Units;
+using UnityEngine;
 
 namespace Game.Combat.Phases
 {
@@ -58,6 +60,16 @@ namespace Game.Combat.Phases
             if (unitRegistry.GetTeam(Team.Enemy).Count == 0) return Team.Player;
 
             return null;
+        }
+
+        public void UpdateHover(Vector2Int position, HighlightType type)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UpdateClick(Vector2Int position, SelectionType type)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
+using Game.Combat.Entities.Factories;
+using Game.Combat.Entities.Grid;
 using Game.Combat.Phases;
-using Game.Combat.Views;
-using Game.Unity.Combat.Views;
 using System.Threading;
 using UnityEngine;
 using VContainer.Unity;
@@ -11,16 +11,19 @@ namespace Game.Combat.Flow
     public class CombatSceneLifetime : IAsyncStartable
     {
         private readonly GridView gridView;
-        private readonly UnitDeployer deployer;
+        private readonly CellFactory cellFactory;
+        private readonly UnitFactory unitFactory;
         private readonly CombatFlow combatFlow;
 
         public CombatSceneLifetime(
             GridView gridView,
-            UnitDeployer deployer,
+            CellFactory cellFactory,
+            UnitFactory unitFactory,
             CombatFlow combatFlow)
         {
             this.gridView = gridView;
-            this.deployer = deployer;
+            this.cellFactory = cellFactory;
+            this.unitFactory = unitFactory;
             this.combatFlow = combatFlow;
         }
 
@@ -28,10 +31,13 @@ namespace Game.Combat.Flow
         {
             Debug.Log("[Combat] Starting async initialization...");
 
+            cellFactory.Create();
+            await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
+
             gridView.PaintGrid();
             await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
 
-            deployer.DeployInitial();
+            unitFactory.CreateTeams();
             await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
 
             combatFlow.Start();

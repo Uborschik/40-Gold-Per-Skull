@@ -1,11 +1,14 @@
 using UnityEngine;
 
-namespace Game.Unity.Combat.Views
+namespace Game.Combat.Entities.Selector
 {
     [RequireComponent(typeof(Transform))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class UnitSelectionView : MonoBehaviour
+    public class HighlightView : MonoBehaviour
     {
+        [SerializeField] private Color activeColor = Color.cyan;
+        [SerializeField] private Color invalidColor = Color.red;
+
         private Transform thisTransform;
         private SpriteRenderer spriteRenderer;
 
@@ -20,7 +23,7 @@ namespace Game.Unity.Combat.Views
                 return;
             }
 
-            Debug.Log($"[UnitSelectionView] Created");
+            Debug.Log($"[HighlightView] Created");
         }
 
         private void Start()
@@ -28,10 +31,12 @@ namespace Game.Unity.Combat.Views
             Hide();
         }
 
-        public void Set(Vector2 position)
+        public void Set(Vector2 position, HighlightType type)
         {
             Show();
+
             thisTransform.position = position;
+            spriteRenderer.color = type == HighlightType.Free ? activeColor : invalidColor;
         }
 
         public void Show() => spriteRenderer.enabled = true;

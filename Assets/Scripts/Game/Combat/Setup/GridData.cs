@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Game.Core.Combat.Setup
+namespace Game.Combat.Setup
 {
     [Serializable]
     public class GridData

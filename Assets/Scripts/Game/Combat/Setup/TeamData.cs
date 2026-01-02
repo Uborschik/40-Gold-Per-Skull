@@ -1,7 +1,7 @@
 ﻿using Game.Combat.Entities.Units;
 using System;
 
-namespace Game.Core.Combat.Setup
+namespace Game.Combat.Setup
 {
     [Serializable]
     public class TeamData

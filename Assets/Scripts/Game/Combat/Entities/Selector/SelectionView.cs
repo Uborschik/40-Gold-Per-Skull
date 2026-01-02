@@ -1,11 +1,12 @@
 using UnityEngine;
 
-namespace Game.Combat.Views
+namespace Game.Combat.Entities.Selector
 {
     [RequireComponent(typeof(Transform))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class HighlightView : MonoBehaviour
+    public class SelectionView : MonoBehaviour
     {
+        [SerializeField] private Color unitColor = Color.white;
         [SerializeField] private Color activeColor = Color.cyan;
         [SerializeField] private Color invalidColor = Color.red;
 
@@ -17,13 +18,7 @@ namespace Game.Combat.Views
             thisTransform = transform;
             spriteRenderer = GetComponent<SpriteRenderer>();
 
-            if (spriteRenderer == null)
-            {
-                Debug.LogError("SpriteRenderer not found on " + gameObject.name, gameObject);
-                return;
-            }
-
-            Debug.Log($"[HighlightView] Created");
+            Debug.Log($"[CellSelectionView] Created");
         }
 
         private void Start()
@@ -31,12 +26,23 @@ namespace Game.Combat.Views
             Hide();
         }
 
-        public void Set(Vector2 position, bool isActiveColor)
+        public void Set(Vector2 position, SelectionType type)
         {
             Show();
-            Debug.Log(position);
             thisTransform.position = position;
-            spriteRenderer.color = isActiveColor ? activeColor : invalidColor;
+
+            switch (type)
+            {
+                case SelectionType.Unit:
+                    spriteRenderer.color = unitColor;
+                    break;
+                case SelectionType.Free:
+                    spriteRenderer.color = activeColor;
+                    break;
+                case SelectionType.Blocked:
+                    spriteRenderer.color = invalidColor;
+                    break;
+            }
         }
 
         public void Show() => spriteRenderer.enabled = true;

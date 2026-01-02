@@ -1,10 +1,14 @@
+using Game.Combat.Entities.Selector;
+using UnityEngine;
+
 namespace Game.Combat.Phases
 {
     public interface ICombatPhase
     {
         bool IsComplete { get; }
         void Enter();
-        void Update();
+        public void UpdateHover(Vector2Int position, HighlightType type);
+        void UpdateClick(Vector2Int position, SelectionType type);
         void Exit();
     }
 }
