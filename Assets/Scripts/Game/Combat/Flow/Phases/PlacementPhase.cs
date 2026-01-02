@@ -5,7 +5,6 @@ using Game.Combat.Grid;
 using Game.Combat.Units;
 using Game.Utils;
 using UnityEngine;
-using VContainer;
 
 namespace Game.Combat.Phases
 {
@@ -30,6 +29,8 @@ namespace Game.Combat.Phases
 
         public void Enter()
         {
+            Debug.Log($"[PlacementPhase] Begin");
+
             gridView.PaintArea(placementArea);
         }
 
@@ -52,10 +53,13 @@ namespace Game.Combat.Phases
             }
             else if (selectedUnit && type == SelectionType.Free)
             {
+                var oldPosition = selectedUnit.Position.ToInt();
+
                 if (unitRegistry.TryMoveUnit(selectedUnit, position))
                 {
-                    cellRegistry.TrySetBlocked(selectedUnit.Position.ToInt(), false);
-                    cellRegistry.TrySetBlocked(position, true);
+                    cellRegistry.TrySetBlocked(oldPosition, position);
+                    selectedUnit.SetPosition(position.ToCenter());
+                    selectedUnit.SetOrder(cellRegistry.Height - position.y);
                     type = SelectionType.Unit;
                 }
             }
@@ -65,12 +69,15 @@ namespace Game.Combat.Phases
 
         public void Exit()
         {
+            IsComplete = true;
             gridView.ClearArea();
+            Reset();
         }
 
-        public void ConfirmPlacement()
+        public void Reset()
         {
-            IsComplete = true;
+            selectedUnit = null;
+            gridView.ClearSelection();
         }
     }
 }

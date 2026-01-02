@@ -1,13 +1,10 @@
-﻿using Game.Combat.Entities.Grid;
-using Game.Combat.Entities.Units;
-using Game.Combat.Grid;
+﻿using Game.Combat.Grid;
 using Game.Combat.Input;
 using Game.Combat.Units;
 using Game.Utils;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using VContainer;
 
 namespace Game.Combat.Entities.Selector
 {
@@ -29,6 +26,7 @@ namespace Game.Combat.Entities.Selector
     {
         public event Action<Vector2Int, HighlightType> Hover;
         public event Action<Vector2Int, SelectionType> Click;
+        public event Action Reset;
 
         private readonly InputService inputService;
         private readonly CellRegistry cellRegistry;
@@ -95,6 +93,8 @@ namespace Game.Combat.Entities.Selector
 
             currentPosition = null;
             selectionType = SelectionType.None;
+
+            Reset?.Invoke();
         }
     }
 }

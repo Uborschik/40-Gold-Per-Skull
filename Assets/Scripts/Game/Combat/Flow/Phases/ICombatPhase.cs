@@ -10,5 +10,6 @@ namespace Game.Combat.Phases
         public void UpdateHover(Vector2Int position, HighlightType type);
         void UpdateClick(Vector2Int position, SelectionType type);
         void Exit();
+        void Reset();
     }
 }

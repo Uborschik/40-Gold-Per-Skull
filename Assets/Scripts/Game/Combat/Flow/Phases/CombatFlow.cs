@@ -1,29 +1,38 @@
 ﻿using Game.Combat.Entities.Selector;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.Combat.Phases
 {
     public class CombatFlow : IDisposable
     {
         private readonly Selector selector;
+        private readonly Button exitPhaseBtn;
         private readonly ICombatPhase[] phases;
         private int currentIndex;
 
-        public CombatFlow(Selector selector, PlacementPhase placement, CombatPhase combat)
+        public CombatFlow(Selector selector, Button exitPhaseBtn, PlacementPhase placement, CombatPhase combat)
         {
             this.selector = selector;
+            this.exitPhaseBtn = exitPhaseBtn;
             phases = new ICombatPhase[] { placement, combat };
             currentIndex = 0;
 
             selector.Hover += HoverTick;
             selector.Click += ClickTick;
+            selector.Reset += OnReset;
+
+            exitPhaseBtn.onClick.AddListener(Exit);
         }
 
         public void Dispose()
         {
             selector.Hover -= HoverTick;
             selector.Click -= ClickTick;
+            selector.Reset += OnReset;
+
+            exitPhaseBtn.onClick.RemoveAllListeners();
         }
 
         public void Start()
@@ -48,6 +57,26 @@ namespace Game.Combat.Phases
             if (TryGetCurrentPhase(out var phase))
             {
                 phase.UpdateClick(position, type);
+            }
+        }
+
+        public void OnReset()
+        {
+            if (TryGetCurrentPhase(out var phase))
+            {
+                phase.Reset();
+            }
+        }
+
+        private void Exit()
+        {
+            if (TryGetCurrentPhase(out var phase))
+            {
+                exitPhaseBtn.gameObject.SetActive(false);
+                if (TryAdvancePhase(out var nextPhase))
+                {
+                    nextPhase.Enter();
+                }
             }
         }
 

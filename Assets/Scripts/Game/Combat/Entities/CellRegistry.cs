@@ -23,6 +23,16 @@ namespace Game.Combat.Grid
             return true;
         }
 
+        public bool TrySetBlocked(Vector2Int oldPos, Vector2Int newPos)
+        {
+            var oldCell = GetCell(oldPos);
+            var newCell = GetCell(newPos);
+            if (newCell == null) return false;
+            oldCell.IsBlocked = false;
+            newCell.IsBlocked = true;
+            return true;
+        }
+
         public bool IsValid(Vector2Int pos) =>
             pos.x >= 0 && pos.x < Width && pos.y >= 0 && pos.y < Height;
     }

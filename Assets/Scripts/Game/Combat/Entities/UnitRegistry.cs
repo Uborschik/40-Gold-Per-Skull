@@ -54,24 +54,10 @@ namespace Game.Combat.Units
         public bool TryMoveUnit(Unit unit, Vector2Int to)
         {
             if (unit.Position == to) return false;
-            if (unitMap.TryGetValue(to, out _)) return false;
+            if (unitMap.ContainsKey(to)) return false;
 
             unitMap.Remove(unit.Position.ToInt());
             unitMap[to] = unit;
-            unit.SetPosition(to.ToCenter());
-
-            return true;
-        }
-
-        public bool TryMoveUnit(Vector2Int from, Vector2Int to)
-        {
-            if (from == to) return false;
-            if (!unitMap.TryGetValue(from, out var unit)) return false;
-            if (unitMap.TryGetValue(to, out _)) return false;
-
-            unitMap.Remove(from);
-            unitMap[to] = unit;
-            unit.SetPosition(to);
 
             return true;
         }

@@ -10,6 +10,7 @@ using Game.Combat.TurnOrder;
 using Game.Combat.Units;
 using Game.Core.Combat.TurnOrder;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 using VContainer.Unity;
 
@@ -20,6 +21,9 @@ namespace Game.Unity.Combat.Installers
         [Space(10f)]
         [SerializeField] private CombatSetupAsset setupAsset;
         [SerializeField] private Camera mainCamera;
+
+        [Header("UI")]
+        [SerializeField] private Button exitPhaseBtn;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -41,7 +45,8 @@ namespace Game.Unity.Combat.Installers
             builder.Register<PlacementPhase>(Lifetime.Scoped)
                 .WithParameter(setupAsset.GridData.PlacementArea);
             builder.Register<CombatPhase>(Lifetime.Scoped);
-            builder.Register<CombatFlow>(Lifetime.Scoped);
+            builder.Register<CombatFlow>(Lifetime.Scoped)
+                .WithParameter(exitPhaseBtn);
 
             builder.Register<IRandomProvider, SystemRandomProvider>(Lifetime.Scoped);
             builder.Register<InitiativeRoller>(Lifetime.Scoped);

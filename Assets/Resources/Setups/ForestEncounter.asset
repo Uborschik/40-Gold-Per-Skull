@@ -16,32 +16,24 @@ MonoBehaviour:
     GridWidth: 34
     GridHeight: 20
     PlacementArea:
-      Min:
-        X: 0
-        Y: 0
-      Max:
-        X: 3
-        Y: 20
-  DeployerData:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 3, y: 20, z: 1}
+  UnitFactoryData:
     TeamData:
     - Team: 0
       Units:
-      - UnitId: 
-        Strength: 0
+      - Strength: 0
         Dexterity: 0
         Constitution: 0
-      - UnitId: 
-        Strength: 0
+      - Strength: 0
         Dexterity: 0
         Constitution: 0
     - Team: 1
       Units:
-      - UnitId: 
-        Strength: 0
+      - Strength: 0
         Dexterity: 0
         Constitution: 0
-      - UnitId: 
-        Strength: 0
+      - Strength: 0
         Dexterity: 0
         Constitution: 0
     Prefab: {fileID: -6881990360450869761, guid: 88d1e733c90fc0a43a4b2b49eaf29018, type: 3}

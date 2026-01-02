@@ -21,6 +21,8 @@ namespace Game.Combat.Phases
 
         public void Enter()
         {
+            Debug.Log($"[CombatPhase] Begin");
+
             StartNewRound();
         }
 
@@ -68,6 +70,11 @@ namespace Game.Combat.Phases
         }
 
         public void UpdateClick(Vector2Int position, SelectionType type)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Reset()
         {
             throw new System.NotImplementedException();
         }

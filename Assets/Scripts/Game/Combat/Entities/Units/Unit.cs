@@ -28,6 +28,7 @@ namespace Game.Combat.Entities.Units
 
         public void SetTeam(Team team) => Team = team;
         public void SetPosition(Vector2 position) => transform.position = position;
+        public void SetOrder(int order) => spriteRenderer.sortingOrder = order;
         public void SetIsAlive(bool isAlive) => IsAlive = isAlive;
     }
 }
