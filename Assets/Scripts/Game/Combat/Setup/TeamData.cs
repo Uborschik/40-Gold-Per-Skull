@@ -1,4 +1,4 @@
-﻿using Game.Combat.Entities.Units;
+﻿using Game.Combat.Core.Entities;
 using System;
 
 namespace Game.Combat.Setup

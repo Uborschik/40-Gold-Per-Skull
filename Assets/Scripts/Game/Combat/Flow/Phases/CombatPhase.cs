@@ -1,82 +1,59 @@
-﻿using Game.Combat.Entities.Selector;
-using Game.Combat.Entities.Units;
-using Game.Combat.TurnOrder;
-using Game.Combat.Units;
+﻿using Game.Combat.Application.UseCases;
+using Game.Combat.Infrastructure.Input;
+using Game.Combat.Infrastructure.View;
+using Game.Utils;
 using UnityEngine;
 
-namespace Game.Combat.Phases
+namespace Game.Combat.Flow.Phases
 {
     public class CombatPhase : ICombatPhase
     {
-        private readonly UnitRegistry unitRegistry;
-        private readonly TurnQueue turnQueue;
+        private readonly GridView gridView;
+        private readonly SelectUnitUseCase selectUseCase;
+        private readonly EndTurnUseCase endTurnUseCase;
 
         public bool IsComplete { get; private set; }
 
-        public CombatPhase(UnitRegistry unitRegistry, TurnQueue turnQueue)
+        public CombatPhase(
+            GridView gridView,
+            SelectUnitUseCase selectUseCase,
+            EndTurnUseCase endTurnUseCase)
         {
-            this.unitRegistry = unitRegistry;
-            this.turnQueue = turnQueue;
+            this.gridView = gridView;
+            this.selectUseCase = selectUseCase;
+            this.endTurnUseCase = endTurnUseCase;
         }
 
         public void Enter()
         {
             Debug.Log($"[CombatPhase] Begin");
-
-            StartNewRound();
-        }
-
-        public void Update() {}
-
-        public void Exit()
-        {
-        }
-
-        private void StartNewRound()
-        {
-            var aliveUnits = unitRegistry.GetAllAliveUnits();
-            turnQueue.Build(aliveUnits);
-        }
-
-        private void OnTurnCompleted()
-        {
-            if (turnQueue.IsRoundComplete())
-            {
-                StartNewRound();
-            }
-        }
-
-        private void OnUnitDied()
-        {
-            var winner = CheckVictoryTeam();
-
-            if (winner.HasValue)
-            {
-                IsComplete = true;
-            }
-        }
-
-        private Team? CheckVictoryTeam()
-        {
-            if (unitRegistry.GetTeam(Team.Player).Count == 0) return Team.Enemy;
-            if (unitRegistry.GetTeam(Team.Enemy).Count == 0) return Team.Player;
-
-            return null;
+            IsComplete = false;
         }
 
         public void UpdateHover(Vector2Int position, HighlightType type)
         {
-            throw new System.NotImplementedException();
+            gridView.PaintHighlight(position.ToCenter(), type);
         }
 
         public void UpdateClick(Vector2Int position, SelectionType type)
         {
-            throw new System.NotImplementedException();
+            selectUseCase.Execute(position, out _);
+            gridView.PaintInputCellSelection(position.ToCenter(), type);
+        }
+
+        public void Exit()
+        {
+            IsComplete = true;
         }
 
         public void Reset()
         {
-            throw new System.NotImplementedException();
+            gridView.ClearSelection();
+        }
+
+        public void EndTurn()
+        {
+            endTurnUseCase.Execute();
         }
     }
 }

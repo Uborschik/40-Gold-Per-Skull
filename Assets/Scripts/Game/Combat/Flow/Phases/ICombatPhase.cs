@@ -1,7 +1,7 @@
-using Game.Combat.Entities.Selector;
+using Game.Combat.Infrastructure.Input;
 using UnityEngine;
 
-namespace Game.Combat.Phases
+namespace Game.Combat.Flow.Phases
 {
     public interface ICombatPhase
     {

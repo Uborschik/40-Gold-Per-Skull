@@ -1,42 +1,45 @@
-﻿using Game.Combat.Entities.Grid;
-using Game.Combat.Entities.Selector;
+﻿using Game.Combat.Application.UseCases;
 using Game.Combat.Entities.Units;
-using Game.Combat.Grid;
-using Game.Combat.Units;
+using Game.Combat.Infrastructure.Input;
+using Game.Combat.Infrastructure.View;
 using Game.Utils;
 using UnityEngine;
 
-namespace Game.Combat.Phases
+namespace Game.Combat.Flow.Phases
 {
     public class PlacementPhase : ICombatPhase
     {
         private readonly GridView gridView;
-        private readonly CellRegistry cellRegistry;
-        private readonly UnitRegistry unitRegistry;
         private readonly BoundsInt placementArea;
+        private readonly SelectUnitUseCase selectUseCase;
+        private readonly MoveUnitUseCase moveUseCase;
 
         private Unit selectedUnit;
-
         public bool IsComplete { get; private set; }
 
-        public PlacementPhase(GridView gridView, CellRegistry cellRegistry, UnitRegistry unitRegistry, BoundsInt placementArea)
+        public PlacementPhase(
+            GridView gridView,
+            BoundsInt placementArea,
+            SelectUnitUseCase selectUseCase,
+            MoveUnitUseCase moveUseCase)
         {
             this.gridView = gridView;
-            this.cellRegistry = cellRegistry;
-            this.unitRegistry = unitRegistry;
             this.placementArea = placementArea;
+            this.selectUseCase = selectUseCase;
+            this.moveUseCase = moveUseCase;
         }
 
         public void Enter()
         {
             Debug.Log($"[PlacementPhase] Begin");
-
+            IsComplete = false;
             gridView.PaintArea(placementArea);
         }
 
         public void UpdateHover(Vector2Int position, HighlightType type)
         {
-            if (!placementArea.Contains((Vector3Int)position)) type = HighlightType.Blocked;
+            if (!placementArea.Contains((Vector3Int)position))
+                type = HighlightType.Blocked;
             gridView.PaintHighlight(position.ToCenter(), type);
         }
 
@@ -44,34 +47,26 @@ namespace Game.Combat.Phases
         {
             if (!placementArea.Contains((Vector3Int)position)) return;
 
-            if (type == SelectionType.Unit)
+            if (selectedUnit == null)
             {
-                if (unitRegistry.TryGetUnit(position, out var unit))
-                {
-                    selectedUnit = unit;
-                }
+                selectUseCase.Execute(position, out selectedUnit);
             }
-            else if (selectedUnit && type == SelectionType.Free)
+            else
             {
-                var oldPosition = selectedUnit.Position.ToInt();
-
-                if (unitRegistry.TryMoveUnit(selectedUnit, position))
+                if (moveUseCase.Execute(selectedUnit, position))
                 {
-                    cellRegistry.TrySetBlocked(oldPosition, position);
-                    selectedUnit.SetPosition(position.ToCenter());
-                    selectedUnit.SetOrder(cellRegistry.Height - position.y);
-                    type = SelectionType.Unit;
+                    selectedUnit = null;
                 }
             }
 
-            gridView.PaintSelection(position.ToCenter(), type);
+            gridView.PaintInputCellSelection(position.ToCenter(), type);
         }
 
         public void Exit()
         {
             IsComplete = true;
             gridView.ClearArea();
-            Reset();
+            selectedUnit = null;
         }
 
         public void Reset()

@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
-using Game.Combat.Entities.Factories;
-using Game.Combat.Entities.Grid;
-using Game.Combat.Phases;
+using Game.Combat.Infrastructure.Factories;
+using Game.Combat.Infrastructure.View;
 using System.Threading;
 using UnityEngine;
 using VContainer.Unity;

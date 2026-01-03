@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Game.Combat.Core.Entities;
 using UnityEngine;
 
 namespace Game.Combat.Entities.Units
 {
     [RequireComponent(typeof(Transform))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class Unit : MonoBehaviour
+    public class Unit : MonoBehaviour, IMovableObject
     {
         private SpriteRenderer spriteRenderer;
 

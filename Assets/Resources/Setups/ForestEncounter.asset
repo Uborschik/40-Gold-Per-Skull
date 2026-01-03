@@ -23,17 +23,17 @@ MonoBehaviour:
     - Team: 0
       Units:
       - Strength: 0
-        Dexterity: 0
+        Dexterity: 1
         Constitution: 0
       - Strength: 0
-        Dexterity: 0
+        Dexterity: 2
         Constitution: 0
     - Team: 1
       Units:
       - Strength: 0
-        Dexterity: 0
+        Dexterity: 3
         Constitution: 0
       - Strength: 0
-        Dexterity: 0
+        Dexterity: 4
         Constitution: 0
     Prefab: {fileID: -6881990360450869761, guid: 88d1e733c90fc0a43a4b2b49eaf29018, type: 3}
