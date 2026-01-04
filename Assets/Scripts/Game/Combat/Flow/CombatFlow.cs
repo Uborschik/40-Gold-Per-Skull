@@ -1,6 +1,7 @@
-﻿using Game.Combat.Application.Notifications;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Flow.Phases;
 using Game.Combat.Infrastructure.Input;
+using Game.Combat.Infrastructure.Systems;
 using System;
 using UnityEngine;
 
@@ -8,19 +9,18 @@ namespace Game.Combat.Flow
 {
     public class CombatFlow : IDisposable
     {
+        private readonly IEventBus events;
         private readonly InputSelector selector;
+        private readonly TurnSystem turnSystem;
         private readonly ICombatPhase[] phases;
-        private readonly INotifyPhaseChanged[] phaseListeners;
         private int currentIndex;
 
-        public CombatFlow(
-            InputSelector selector,
-            ICombatPhase[] phases,
-            INotifyPhaseChanged[] phaseListeners)
+        public CombatFlow(IEventBus events, InputSelector selector, TurnSystem turnSystem, ICombatPhase[] phases)
         {
+            this.events = events;
             this.selector = selector;
+            this.turnSystem = turnSystem;
             this.phases = phases;
-            this.phaseListeners = phaseListeners;
             currentIndex = 0;
 
             selector.Hover += OnHover;
@@ -46,15 +46,14 @@ namespace Game.Combat.Flow
         private void EnterPhase(ICombatPhase phase)
         {
             phase.Enter();
-            foreach (var listener in phaseListeners)
-                listener.PhaseEntered(phase);
+            if (phase is CombatPhase) turnSystem.StartNewRound();
+            events.Publish(new PhaseChanged(phase, true));
         }
 
         private void ExitPhase(ICombatPhase phase)
         {
             phase.Exit();
-            foreach (var listener in phaseListeners)
-                listener.PhaseExited(phase);
+            events.Publish(new PhaseChanged(phase, false));
         }
 
         private void OnHover(Vector2Int position, HighlightType type)

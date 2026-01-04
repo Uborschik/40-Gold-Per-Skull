@@ -1,76 +1,54 @@
-﻿using Game.Combat.Application.Notifications;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Core.Entities;
 using Game.Combat.Entities.Units;
-using Game.Combat.Flow.Phases;
 using Game.Combat.Infrastructure.Input;
 using Game.Combat.Infrastructure.TurnOrder;
 using Game.Combat.Infrastructure.View;
 using Game.Utils;
-using UnityEngine;
+using System;
 
 namespace Game.Combat.Infrastructure.Systems
 {
-    public class TurnSystem : INotifyUnitMoved, INotifyUnitDied, INotifyPhaseChanged, INotifyTurnChanged
+    public class TurnSystem : IEventListener<TurnChanged>, IEventListener<UnitMoved>, IDisposable
     {
+        private readonly IEventBus events;
         private readonly TurnQueue turnQueue;
         private readonly UnitRegistry unitRegistry;
         private readonly GridView gridView;
 
         public TurnSystem(
+            IEventBus events,
             TurnQueue turnQueue,
             UnitRegistry unitRegistry,
             GridView gridView)
         {
+            this.events = events;
             this.turnQueue = turnQueue;
             this.unitRegistry = unitRegistry;
             this.gridView = gridView;
+
+            events.Subscribe<TurnChanged>(this);
+            events.Subscribe<UnitMoved>(this);
         }
 
-        void INotifyPhaseChanged.PhaseEntered(ICombatPhase phase)
+        public void Dispose()
         {
-            if (phase is CombatPhase)
-            {
-                StartNewRound();
-            }
+            events.Unsubscribe<TurnChanged>(this);
+            events.Unsubscribe<UnitMoved>(this);
         }
 
-        void INotifyPhaseChanged.PhaseExited(ICombatPhase phase) { }
-
-        void INotifyUnitMoved.UnitMoved(Unit unit, Vector2Int newPosition)
+        public void OnEvent(TurnChanged evt)
         {
-            unit.SetOrder(unitRegistry.Height - newPosition.y);
+            HighlightCurrentUnit(evt.CurrentUnit);
+            CheckVictory();
         }
 
-        void INotifyUnitDied.UnitDied(Unit unit)
+        public void OnEvent(UnitMoved evt)
         {
-            turnQueue.Remove(unit);
-
-            var winner = CheckVictory();
-            if (winner.HasValue)
-            {
-                Victory(winner.Value);
-            }
+            evt.Unit.SetOrder(unitRegistry.Height - evt.NewPosition.y);
         }
 
-        private void Victory(Team winner)
-        {
-            Debug.Log($"[TurnSystem] Victory: {winner}");
-        }
-
-        void INotifyUnitDied.Victory(Team winner)
-        {
-            Debug.Log($"[TurnSystem] Victory: {winner}");
-        }
-
-        void INotifyTurnChanged.TurnChanged(Unit currentUnit)
-        {
-            if (currentUnit != null)
-            {
-                HighlightCurrentUnit(currentUnit);
-            }
-        }
-
-        private void StartNewRound()
+        public void StartNewRound()
         {
             var aliveUnits = unitRegistry.GetAllAliveUnits();
             turnQueue.Build(aliveUnits);

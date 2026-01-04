@@ -14,7 +14,6 @@ namespace Game.Combat.Infrastructure.Input
 
         public InputService(Camera mainCamera)
         {
-            Debug.Log($"[InputService] Created");
             this.mainCamera = mainCamera;
 
             actions = new InputActions();

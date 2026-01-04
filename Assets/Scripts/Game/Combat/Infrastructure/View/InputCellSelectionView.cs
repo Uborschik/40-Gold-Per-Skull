@@ -19,8 +19,6 @@ namespace Game.Combat.Infrastructure.View
         {
             thisTransform = transform;
             spriteRenderer = GetComponent<SpriteRenderer>();
-
-            Debug.Log($"[CellSelectionView] Created");
         }
 
         private void Start()

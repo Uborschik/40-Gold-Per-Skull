@@ -1,4 +1,4 @@
-﻿using Game.Combat.Application.Notifications;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Application.UseCases;
 using Game.Combat.Entities.Grid;
 using Game.Combat.Entities.Units;
@@ -6,6 +6,7 @@ using Game.Combat.Flow;
 using Game.Combat.Flow.Commands;
 using Game.Combat.Flow.Mediators;
 using Game.Combat.Flow.Phases;
+using Game.Combat.Infrastructure.Events;
 using Game.Combat.Infrastructure.Factories;
 using Game.Combat.Infrastructure.Input;
 using Game.Combat.Infrastructure.Systems;
@@ -36,16 +37,20 @@ namespace Game.Combat
                 .WithParameter(setupAsset.GridData.GridHeight);
             builder.Register<InputService>(Lifetime.Singleton)
                 .WithParameter(mainCamera);
-
-            builder.Register<PhaseButtonMediator>(Lifetime.Scoped)
-                .WithParameter(phaseBtn);
-
-            builder.Register<ICommandFactory, CommandFactory>(Lifetime.Scoped);
+            builder.Register<IEventBus, EventBus>(Lifetime.Singleton);
 
             builder.Register<EndPhaseCommand>(Lifetime.Scoped);
             builder.Register<EndTurnCommand>(Lifetime.Scoped);
 
+            builder.Register<ICommandFactory, CommandFactory>(Lifetime.Scoped);
+
+            builder.Register<PhaseButtonMediator>(Lifetime.Scoped)
+                .AsSelf()
+                .AsImplementedInterfaces()
+                .WithParameter(phaseBtn);
+
             builder.RegisterComponentInHierarchy<GridView>();
+            builder.RegisterComponentInHierarchy<UIHandler>();
 
             builder.Register<CellFactory>(Lifetime.Scoped)
                 .WithParameter(setupAsset.GridData);
@@ -58,80 +63,19 @@ namespace Game.Combat
             builder.Register<TurnSystem>(Lifetime.Scoped);
             builder.Register<GridViewUpdater>(Lifetime.Scoped);
 
-            builder.Register(resolver =>
-            {
-                var listeners = new INotifyUnitSelected[]
-                {
-                    resolver.Resolve<GridViewUpdater>()
-                };
+            builder.Register<SelectUnitUseCase>(Lifetime.Scoped);
+            builder.Register<MoveUnitUseCase>(Lifetime.Scoped);
+            builder.Register<EndTurnUseCase>(Lifetime.Scoped);
 
-                return new SelectUnitUseCase(resolver.Resolve<UnitRegistry>(), listeners);
-            }, Lifetime.Scoped);
-
-            builder.Register(resolver =>
-            {
-                var listeners = new INotifyUnitMoved[]
-                {
-                    resolver.Resolve<TurnSystem>(),
-                    resolver.Resolve<GridViewUpdater>()
-                };
-
-                return new MoveUnitUseCase(
-                    resolver.Resolve<CellRegistry>(),
-                    resolver.Resolve<UnitRegistry>(),
-                    listeners
-                );
-            }, Lifetime.Scoped);
-
-            builder.Register(resolver =>
-            {
-                var listeners = new INotifyUnitSelected[]
-                {
-                    resolver.Resolve<GridViewUpdater>()
-                };
-
-                var turnChangedListeners = new INotifyTurnChanged[]
-                {
-                    resolver.Resolve<TurnSystem>() // ✅ Добавить!
-                };
-
-                return new EndTurnUseCase(resolver.Resolve<TurnQueue>(), listeners, turnChangedListeners);
-            }, Lifetime.Scoped);
-
-            builder.Register(resolver =>
-            {
-                return new PlacementPhase(
-                    resolver.Resolve<GridView>(),
-                    setupAsset.GridData.PlacementArea,
-                    resolver.Resolve<SelectUnitUseCase>(),
-                    resolver.Resolve<MoveUnitUseCase>()
-                );
-            }, Lifetime.Scoped);
-
+            builder.Register<PlacementPhase>(Lifetime.Scoped)
+                .WithParameter(setupAsset.GridData.PlacementArea);
             builder.Register<CombatPhase>(Lifetime.Scoped);
 
             builder.Register<InputSelector>(Lifetime.Scoped);
 
-            builder.Register(resolver =>
-            {
-                var phases = new ICombatPhase[]
-                {
-                    resolver.Resolve<PlacementPhase>(),
-                    resolver.Resolve<CombatPhase>()
-                };
-
-                var phaseListeners = new INotifyPhaseChanged[]
-                {
-                    resolver.Resolve<TurnSystem>(),
-                    resolver.Resolve<PhaseButtonMediator>()
-                };
-
-                return new CombatFlow(
-                    resolver.Resolve<InputSelector>(),
-                    phases,
-                    phaseListeners
-                );
-            }, Lifetime.Scoped);
+            builder.Register<CombatFlow>(Lifetime.Scoped)
+                .WithParameter(resolver => new ICombatPhase[]
+                { resolver.Resolve<PlacementPhase>(), resolver.Resolve<CombatPhase>() });
 
             builder.RegisterEntryPoint<CombatSceneLifetime>(Lifetime.Scoped);
         }

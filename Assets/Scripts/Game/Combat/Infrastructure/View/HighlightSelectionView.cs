@@ -23,8 +23,6 @@ namespace Game.Combat.Infrastructure.View
                 Debug.LogError("SpriteRenderer not found on " + gameObject.name, gameObject);
                 return;
             }
-
-            Debug.Log($"[HighlightView] Created");
         }
 
         private void Start()

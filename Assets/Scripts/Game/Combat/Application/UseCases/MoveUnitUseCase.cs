@@ -1,4 +1,5 @@
-﻿using Game.Combat.Application.Notifications;
+﻿// Game/Combat/Application/UseCases/MoveUnitUseCase.cs
+using Game.Combat.Application.Events;
 using Game.Combat.Entities.Grid;
 using Game.Combat.Entities.Units;
 using Game.Utils;
@@ -8,39 +9,29 @@ namespace Game.Combat.Application.UseCases
 {
     public class MoveUnitUseCase
     {
-        private readonly CellRegistry cellRegistry;
-        private readonly UnitRegistry unitRegistry;
-        private readonly INotifyUnitMoved[] listeners;
+        private readonly CellRegistry cells;
+        private readonly UnitRegistry units;
+        private readonly IEventBus events;
 
-        public MoveUnitUseCase(
-            CellRegistry cellRegistry,
-            UnitRegistry unitRegistry,
-            INotifyUnitMoved[] listeners)
+        public MoveUnitUseCase(CellRegistry cells, UnitRegistry units, IEventBus events)
         {
-            this.cellRegistry = cellRegistry;
-            this.unitRegistry = unitRegistry;
-            this.listeners = listeners;
+            this.cells = cells;
+            this.units = units;
+            this.events = events;
         }
 
         public bool Execute(Unit unit, Vector2Int target)
         {
-            if (unit == null || !cellRegistry.IsWalkable(target))
-                return false;
+            if (!cells.IsWalkable(target)) return false;
 
-            var oldPosition = unit.Position.ToInt();
+            var oldPos = unit.Position.ToInt();
+            if (!units.TryMoveUnit(unit, target)) return false;
 
-            if (unitRegistry.TryMoveUnit(unit, target))
-            {
-                cellRegistry.TrySetBlocked(oldPosition, false);
-                cellRegistry.TrySetBlocked(target, true);
-                unit.SetPosition(target.ToCenter());
+            cells.TrySetBlocked(oldPos, target);
+            unit.SetPosition(target.ToCenter());
 
-                foreach (var listener in listeners)
-                    listener.UnitMoved(unit, target);
-
-                return true;
-            }
-            return false;
+            events.Publish(new UnitMoved(unit, target));
+            return true;
         }
     }
 }

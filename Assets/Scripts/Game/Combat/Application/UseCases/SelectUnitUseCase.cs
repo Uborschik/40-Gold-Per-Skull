@@ -1,4 +1,4 @@
-﻿using Game.Combat.Application.Notifications;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Entities.Units;
 using UnityEngine;
 
@@ -7,28 +7,24 @@ namespace Game.Combat.Application.UseCases
     public class SelectUnitUseCase
     {
         private readonly UnitRegistry unitRegistry;
-        private readonly INotifyUnitSelected[] listeners;
+        private readonly IEventBus events;
 
-        public SelectUnitUseCase(
-            UnitRegistry unitRegistry,
-            INotifyUnitSelected[] listeners)
+        public SelectUnitUseCase(UnitRegistry unitRegistry, IEventBus events)
         {
             this.unitRegistry = unitRegistry;
-            this.listeners = listeners;
+            this.events = events;
         }
 
         public bool Execute(Vector2Int position, out Unit selectedUnit)
         {
             if (unitRegistry.TryGetUnit(position, out selectedUnit))
             {
-                foreach (var listener in listeners)
-                    listener.UnitSelected(selectedUnit);
+                events.Publish(new UnitSelected(selectedUnit));
                 return true;
             }
 
             selectedUnit = null;
-            foreach (var listener in listeners)
-                listener.UnitDeselected();
+            events.Publish(new UnitSelected(selectedUnit));
             return false;
         }
     }

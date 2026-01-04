@@ -1,4 +1,4 @@
-﻿using Game.Combat.Application.Notifications;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Infrastructure.TurnOrder;
 
 namespace Game.Combat.Application.UseCases
@@ -6,30 +6,18 @@ namespace Game.Combat.Application.UseCases
     public class EndTurnUseCase
     {
         private readonly TurnQueue turnQueue;
-        private readonly INotifyUnitSelected[] selectionListeners;
-        private readonly INotifyTurnChanged[] turnChangedListeners;
+        private readonly IEventBus events;
 
-        public EndTurnUseCase(
-            TurnQueue turnQueue,
-            INotifyUnitSelected[] selectionListeners,
-            INotifyTurnChanged[] turnChangedListeners)
+        public EndTurnUseCase(TurnQueue turnQueue, IEventBus events)
         {
             this.turnQueue = turnQueue;
-            this.selectionListeners = selectionListeners;
-            this.turnChangedListeners = turnChangedListeners;
+            this.events = events;
         }
 
         public void Execute()
         {
             turnQueue.Advance();
-
-            foreach (var listener in selectionListeners)
-                listener.UnitDeselected();
-
-            var currentUnit = turnQueue.Current;
-            if (currentUnit != null)
-                foreach (var listener in turnChangedListeners)
-                    listener?.TurnChanged(currentUnit);
+            events.Publish(new TurnChanged(turnQueue.Current));
         }
     }
 }

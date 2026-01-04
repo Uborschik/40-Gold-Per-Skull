@@ -1,39 +1,44 @@
-﻿using Game.Combat.Application.Notifications;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Core.Entities;
 using Game.Combat.Entities.Grid;
-using Game.Combat.Entities.Units;
 using Game.Combat.Infrastructure.Input;
 using Game.Combat.Infrastructure.View;
 using Game.Utils;
-using UnityEngine;
+using System;
 
 namespace Game.Combat.Infrastructure.Systems
 {
-    public class GridViewUpdater : INotifyUnitMoved, INotifyUnitSelected
+    public class GridViewUpdater : IEventListener<UnitMoved>, IEventListener<UnitSelected>, IDisposable
     {
+        private readonly IEventBus eventBus;
         private readonly GridView gridView;
         private readonly CellRegistry cellRegistry;
 
-        public GridViewUpdater(GridView gridView, CellRegistry cellRegistry)
+        public GridViewUpdater(IEventBus eventBus, GridView gridView, CellRegistry cellRegistry)
         {
+            this.eventBus = eventBus;
             this.gridView = gridView;
             this.cellRegistry = cellRegistry;
+
+            eventBus.Subscribe<UnitMoved>(this);
+            eventBus.Subscribe<UnitSelected>(this);
         }
 
-        void INotifyUnitMoved.UnitMoved(Unit unit, Vector2Int newPosition)
+        public void Dispose()
         {
-            unit.SetOrder(cellRegistry.Height - newPosition.y);
+            eventBus.Unsubscribe<UnitMoved>(this);
+            eventBus.Unsubscribe<UnitSelected>(this);
         }
 
-        void INotifyUnitSelected.UnitSelected(Unit unit)
+        public void OnEvent(UnitMoved evt)
         {
-            var type = unit.Team == Team.Player ? SelectionType.AllyUnit : SelectionType.EnemyUnit;
-            gridView.PaintInputCellSelection(unit.Position.ToCenter(), type);
+            evt.Unit.SetOrder(cellRegistry.Height - evt.NewPosition.y);
         }
 
-        void INotifyUnitSelected.UnitDeselected()
+        public void OnEvent(UnitSelected evt)
         {
-            gridView.ClearSelection();
+            var type = evt.Unit.Team == Team.Player ? SelectionType.AllyUnit : SelectionType.EnemyUnit;
+            gridView.PaintInputCellSelection(evt.Unit.Position.ToCenter(), type);
         }
     }
 }

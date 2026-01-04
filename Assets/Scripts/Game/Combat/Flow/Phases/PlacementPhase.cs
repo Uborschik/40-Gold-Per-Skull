@@ -31,7 +31,6 @@ namespace Game.Combat.Flow.Phases
 
         public void Enter()
         {
-            Debug.Log($"[PlacementPhase] Begin");
             IsComplete = false;
             gridView.PaintArea(placementArea);
         }
