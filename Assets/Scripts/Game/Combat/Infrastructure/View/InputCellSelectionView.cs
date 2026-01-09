@@ -33,10 +33,10 @@ namespace Game.Combat.Infrastructure.View
 
             switch (type)
             {
-                case SelectionType.AllyUnit:
+                case SelectionType.Ally:
                     spriteRenderer.color = allyUnitColor;
                     break;
-                case SelectionType.EnemyUnit:
+                case SelectionType.Enemy:
                     spriteRenderer.color = enemyUnitColor;
                     break;
                 case SelectionType.Free:

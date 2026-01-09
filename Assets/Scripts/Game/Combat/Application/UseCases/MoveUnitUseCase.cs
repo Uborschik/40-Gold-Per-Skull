@@ -1,5 +1,4 @@
-﻿// Game/Combat/Application/UseCases/MoveUnitUseCase.cs
-using Game.Combat.Application.Events;
+﻿using Game.Combat.Application.Events;
 using Game.Combat.Entities.Grid;
 using Game.Combat.Entities.Units;
 using Game.Utils;
@@ -9,26 +8,25 @@ namespace Game.Combat.Application.UseCases
 {
     public class MoveUnitUseCase
     {
+        private readonly IEventBus events;
         private readonly CellRegistry cells;
         private readonly UnitRegistry units;
-        private readonly IEventBus events;
 
-        public MoveUnitUseCase(CellRegistry cells, UnitRegistry units, IEventBus events)
+        public MoveUnitUseCase(IEventBus events, CellRegistry cells, UnitRegistry units)
         {
+            this.events = events;
             this.cells = cells;
             this.units = units;
-            this.events = events;
         }
 
         public bool Execute(Unit unit, Vector2Int target)
         {
             if (!cells.IsWalkable(target)) return false;
-
-            var oldPos = unit.Position.ToInt();
             if (!units.TryMoveUnit(unit, target)) return false;
 
-            cells.TrySetBlocked(oldPos, target);
+            cells.TrySetBlocked(unit.Position.ToInt(), target);
             unit.SetPosition(target.ToCenter());
+            unit.SetOrder(cells.Height - target.y);
 
             events.Publish(new UnitMoved(unit, target));
             return true;

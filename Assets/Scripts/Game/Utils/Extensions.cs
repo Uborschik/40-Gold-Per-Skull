@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
-using VContainer;
 
 namespace Game.Utils
 {
@@ -15,6 +13,9 @@ namespace Game.Utils
 
         public static Vector2 ToCenter(this Vector2Int v) =>
             new(v.x + 0.5f, v.y + 0.5f);
+
+        public static Vector3Int To3Int(this Vector2Int v) =>
+            new(v.x, v.y);
 
         public static IEnumerable<Vector3Int> AllCells<T>(this T[,] array)
         {

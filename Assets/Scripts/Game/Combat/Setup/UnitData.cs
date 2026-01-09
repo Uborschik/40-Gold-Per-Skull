@@ -5,6 +5,7 @@ namespace Game.Combat.Setup
     [Serializable]
     public class UnitData
     {
+        public string Name;
         public int Strength;
         public int Dexterity;
         public int Constitution;

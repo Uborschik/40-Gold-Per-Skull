@@ -11,14 +11,17 @@ namespace Game.Combat.Infrastructure.Input
     public enum HighlightType
     {
         None,
+        Ally,
+        Enemy,
         Free,
-        Blocked
+        Blocked,
+        MoveableArea
     }
     public enum SelectionType
     {
         None,
-        AllyUnit,
-        EnemyUnit,
+        Ally,
+        Enemy,
         Free,
         Blocked
     }
@@ -71,7 +74,7 @@ namespace Game.Combat.Infrastructure.Input
 
             var position = currentPosition.Value;
             var selectionType = unitRegistry.TryGetUnit(position, out var unit)
-                ? (unit.Team == Team.Player ? SelectionType.AllyUnit : SelectionType.EnemyUnit)
+                ? (unit.Team == Team.Player ? SelectionType.Ally : SelectionType.Enemy)
                 : SelectionType.Free;
 
             Click?.Invoke(position, selectionType);

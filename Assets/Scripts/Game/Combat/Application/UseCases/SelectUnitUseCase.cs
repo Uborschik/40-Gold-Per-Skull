@@ -24,7 +24,6 @@ namespace Game.Combat.Application.UseCases
             }
 
             selectedUnit = null;
-            events.Publish(new UnitSelected(selectedUnit));
             return false;
         }
     }

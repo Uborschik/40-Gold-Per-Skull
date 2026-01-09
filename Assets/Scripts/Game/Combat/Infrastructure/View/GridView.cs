@@ -1,6 +1,7 @@
 ﻿using Game.Combat.Entities.Grid;
 using Game.Combat.Infrastructure.Input;
 using Game.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using VContainer;
@@ -13,9 +14,11 @@ namespace Game.Combat.Infrastructure.View
 
         [SerializeField] private Tilemap mainTilemap;
         [SerializeField] private Tilemap selectionTilemap;
+        [SerializeField] private Tilemap movableTilemap;
 
         [SerializeField] private TileBase groundTile;
         [SerializeField] private TileBase selectionTile;
+        [SerializeField] private TileBase moveableTile;
 
         [SerializeField] private HighlightSelectionView highlightSelection;
         [SerializeField] private InputCellSelectionView inputCellSelection;
@@ -37,12 +40,21 @@ namespace Game.Combat.Infrastructure.View
             }
         }
 
+        public void PaintMovableArea(HashSet<Vector2Int> area)
+        {
+            foreach (var position in area)
+            {
+                movableTilemap.SetTile(position.To3Int(), moveableTile);
+            }
+        }
+
         public void PaintHighlight(Vector2 position, HighlightType type) => highlightSelection.Set(position, type);
         public void PaintInputCellSelection(Vector2 position, SelectionType type) => inputCellSelection.Set(position, type);
         public void PaintTurnCellSelection(Vector2 position, SelectionType type) => turnCellSelection.Set(position, type);
 
         public void ClearGrid() => mainTilemap.ClearAllTiles();
         public void ClearArea() => selectionTilemap.ClearAllTiles();
+        public void ClearMovableArea() => movableTilemap.ClearAllTiles();
         public void ClearHighlight() => highlightSelection.Hide();
         public void ClearSelection() => inputCellSelection.Hide();
     }

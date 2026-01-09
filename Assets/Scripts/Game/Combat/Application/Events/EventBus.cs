@@ -1,4 +1,5 @@
 ﻿using Game.Combat.Application.Events;
+using System;
 using System.Collections.Generic;
 
 namespace Game.Combat.Infrastructure.Events
@@ -7,7 +8,7 @@ namespace Game.Combat.Infrastructure.Events
     {
         private readonly Dictionary<System.Type, List<object>> subscribers = new();
 
-        public void Subscribe<TEvent>(IEventListener<TEvent> listener)
+        public void Subscribe<TEvent>(Action<TEvent> listener)
         {
             var key = typeof(TEvent);
             if (!subscribers.ContainsKey(key))
@@ -16,7 +17,7 @@ namespace Game.Combat.Infrastructure.Events
             subscribers[key].Add(listener);
         }
 
-        public void Unsubscribe<TEvent>(IEventListener<TEvent> listener)
+        public void Unsubscribe<TEvent>(Action<TEvent> listener)
         {
             var key = typeof(TEvent);
             if (subscribers.TryGetValue(key, out var list))
@@ -30,7 +31,9 @@ namespace Game.Combat.Infrastructure.Events
 
             foreach (var listener in list.ToArray())
             {
-                (listener as IEventListener<TEvent>)?.OnEvent(evt);
+                if (listener == null) return;
+
+                (listener as Action<TEvent>)?.Invoke(evt);
             }
         }
     }

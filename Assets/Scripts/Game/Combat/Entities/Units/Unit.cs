@@ -9,6 +9,11 @@ namespace Game.Combat.Entities.Units
     {
         private SpriteRenderer spriteRenderer;
 
+        public string Name { get; private set; }
+        public Health Health { get; private set; }
+        public ActionPoints ActionPoints { get; private set; }
+        public int AttackRange { get; internal set; }
+        public int Speed { get; private set; }
         public Stats Stats { get; private set; }
         public Team Team { get; private set; }
         public Vector2 Position => transform.position;
@@ -19,12 +24,31 @@ namespace Game.Combat.Entities.Units
             spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
-        public void Initialize(Stats stats, Team team, Vector2 position)
+        public void Initialize(string name, Health health, ActionPoints actionPoints, int attackRange, int speed, Stats stats, Team team, Vector2 position)
         {
+            Name = name;
+            Health = health;
+            ActionPoints = actionPoints;
+            AttackRange = attackRange;
+            Speed = speed;
             Stats = stats;
             Team = team;
             transform.position = position;
         }
+
+        public void TakeDamage(int damage)
+        {
+            Health.TakeDamage(damage);
+
+            if (Health.IsDead)
+            {
+                SetIsAlive(false);
+                spriteRenderer.color = Color.gray;
+            }
+        }
+
+        public bool TrySpendAction() => ActionPoints.Spend();
+        public void RefreshActions() => ActionPoints.Refresh();
 
         public void SetTeam(Team team) => Team = team;
         public void SetPosition(Vector2 position) => transform.position = position;

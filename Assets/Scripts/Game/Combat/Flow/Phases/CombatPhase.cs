@@ -1,4 +1,6 @@
-﻿using Game.Combat.Application.UseCases;
+﻿using Game.Combat.Application.Events;
+using Game.Combat.Application.Turns;
+using Game.Combat.Core.Entities;
 using Game.Combat.Infrastructure.Input;
 using Game.Combat.Infrastructure.View;
 using Game.Utils;
@@ -6,54 +8,68 @@ using UnityEngine;
 
 namespace Game.Combat.Flow.Phases
 {
-    public class CombatPhase : ICombatPhase
+    public class CombatPhase : IInteractivePhase
     {
         private readonly GridView gridView;
-        private readonly SelectUnitUseCase selectUseCase;
-        private readonly EndTurnUseCase endTurnUseCase;
+        private readonly BattleCyclic turnController;
+        private readonly IEventBus events;
 
         public bool IsComplete { get; private set; }
 
         public CombatPhase(
             GridView gridView,
-            SelectUnitUseCase selectUseCase,
-            EndTurnUseCase endTurnUseCase)
+            BattleCyclic turnController,
+            IEventBus events)
         {
             this.gridView = gridView;
-            this.selectUseCase = selectUseCase;
-            this.endTurnUseCase = endTurnUseCase;
+            this.turnController = turnController;
+            this.events = events;
+
+            events.Subscribe<ShowMoveableAreaRequested>(OnShowMovableArea);
+            events.Subscribe<HideMoveableAreaRequested>(OnHideMovableArea);
         }
 
         public void Enter()
         {
-            Debug.Log($"[CombatPhase] Begin");
+            Debug.Log("[NewCombatPhase] Начало боевой фазы");
             IsComplete = false;
-        }
 
-        public void UpdateHover(Vector2Int position, HighlightType type)
-        {
-            gridView.PaintHighlight(position.ToCenter(), type);
-        }
-
-        public void UpdateClick(Vector2Int position, SelectionType type)
-        {
-            selectUseCase.Execute(position, out _);
-            gridView.PaintInputCellSelection(position.ToCenter(), type);
+            turnController.InitializeBattle();
         }
 
         public void Exit()
         {
             IsComplete = true;
+            OnHideMovableArea(new HideMoveableAreaRequested());
+            OnHideAttackRange(new HideAttackRangeRequested());
+
+            Debug.Log("[NewCombatPhase] Конец боевой фазы");
         }
 
-        public void Reset()
+        public void UpdateHover(Vector2Int position, HighlightType type) { }
+
+        public void UpdateClick(Vector2Int position, SelectionType type) { }
+
+        public void Reset() { }
+
+        private void OnShowMovableArea(ShowMoveableAreaRequested evt)
         {
-            gridView.ClearSelection();
+            gridView.PaintMovableArea(evt.Positions);
         }
 
-        public void EndTurn()
+        private void OnHideMovableArea(HideMoveableAreaRequested evt)
         {
-            endTurnUseCase.Execute();
+            gridView.ClearMovableArea();
+        }
+
+        private void OnShowAttackRange(ShowAttackRangeRequested evt)
+        {
+            gridView.PaintMovableArea(evt.Positions);
+        }
+
+        private void OnHideAttackRange(HideAttackRangeRequested evt)
+        {
+            gridView.ClearMovableArea();
         }
     }
 }

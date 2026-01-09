@@ -10,6 +10,9 @@ namespace Game.Combat.Entities.Units
     {
         private readonly Dictionary<Vector2Int, Unit> unitMap = new();
         private readonly Dictionary<Team, List<Unit>> teamMap = new();
+        private readonly Dictionary<Team, List<Unit>> cachedTeamLists = new();
+
+        private bool cacheInvalidated = true;
 
         public int Width { get; }
         public int Height { get; }
@@ -24,11 +27,25 @@ namespace Game.Combat.Entities.Units
 
         public List<Unit> GetAllAliveUnits() => unitMap.Values.Where(unit => unit.IsAlive).ToList();
 
-        public List<Unit> GetTeam(Team team) => teamMap.TryGetValue(team, out var units) ? units : new List<Unit>();
+        public IReadOnlyList<Unit> GetTeam(Team team)
+        {
+            if (cacheInvalidated)
+            {
+                RebuildCache();
+                cacheInvalidated = false;
+            }
+
+            if (!cachedTeamLists.ContainsKey(team))
+            {
+                cachedTeamLists[team] = new List<Unit>(teamMap[team]);
+            }
+
+            return cachedTeamLists[team];
+        }
 
         public bool TryAddUnit(Vector2Int position, Unit unit)
         {
-            if (!isValid(position)) return false;
+            if (!IsValid(position)) return false;
             if (unitMap.ContainsKey(position))
                 return false;
 
@@ -38,14 +55,14 @@ namespace Game.Combat.Entities.Units
                 teamMap.Add(unit.Team, new List<Unit>());
             teamMap[unit.Team].Add(unit);
 
-            unit.SetPosition(position);
+            cacheInvalidated = true;
 
             return true;
         }
 
         public bool TryRemoveUnit(Vector2Int position)
         {
-            if (!isValid(position)) return false;
+            if (!IsValid(position)) return false;
             if (!unitMap.TryGetValue(position, out var unit))
                 return false;
 
@@ -59,12 +76,14 @@ namespace Game.Combat.Entities.Units
                     teamMap.Remove(unit.Team);
             }
 
+            cacheInvalidated = true;
+
             return true;
         }
 
         public bool TryMoveUnit(Unit unit, Vector2Int to)
         {
-            if (!isValid(to)) return false;
+            if (!IsValid(to)) return false;
             if (unit.Position == to) return false;
             if (unitMap.ContainsKey(to)) return false;
 
@@ -74,7 +93,15 @@ namespace Game.Combat.Entities.Units
             return true;
         }
 
-        private bool isValid(Vector2Int position)
+        private void RebuildCache()
+        {
+            cachedTeamLists.Clear();
+
+            foreach (var teamPair in teamMap)
+                cachedTeamLists[teamPair.Key] = new List<Unit>(teamPair.Value);
+        }
+
+        private bool IsValid(Vector2Int position)
         {
             return position.x >= 0 && position.y >= 0 && position.x < Width && position.y < Height;
         }

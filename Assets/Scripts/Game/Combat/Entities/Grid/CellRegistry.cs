@@ -26,7 +26,7 @@ namespace Game.Combat.Entities.Grid
         {
             var oldCell = GetCell(oldPos);
             var newCell = GetCell(newPos);
-            if (newCell == null) return false;
+            if (oldCell == null || newCell == null) return false;
             oldCell.IsBlocked = false;
             newCell.IsBlocked = true;
             return true;

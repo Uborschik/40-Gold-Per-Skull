@@ -1,27 +1,30 @@
 ﻿using Game.Combat.Application.Events;
 using Game.Combat.Flow.Phases;
 using Game.Combat.Infrastructure.Input;
-using Game.Combat.Infrastructure.Systems;
 using System;
 using UnityEngine;
 
 namespace Game.Combat.Flow
 {
+    public enum Phase { None, Placement, Combat, Result }
+
     public class CombatFlow : IDisposable
     {
+        public Phase CurrentPhase { get; private set; }
+
         private readonly IEventBus events;
         private readonly InputSelector selector;
-        private readonly TurnSystem turnSystem;
-        private readonly ICombatPhase[] phases;
-        private int currentIndex;
+        private readonly PlacementPhase placement;
+        private readonly CombatPhase combat;
 
-        public CombatFlow(IEventBus events, InputSelector selector, TurnSystem turnSystem, ICombatPhase[] phases)
+        public CombatFlow(IEventBus events, InputSelector selector, PlacementPhase placement, CombatPhase combat)
         {
+            CurrentPhase = 0;
+
             this.events = events;
             this.selector = selector;
-            this.turnSystem = turnSystem;
-            this.phases = phases;
-            currentIndex = 0;
+            this.placement = placement;
+            this.combat = combat;
 
             selector.Hover += OnHover;
             selector.Click += OnClick;
@@ -37,58 +40,49 @@ namespace Game.Combat.Flow
 
         public void Start()
         {
-            if (phases.Length == 0) return;
-
-            currentIndex = 0;
-            EnterPhase(phases[0]);
+            Advance();
         }
 
-        private void EnterPhase(ICombatPhase phase)
+        public void Advance()
         {
-            phase.Enter();
-            if (phase is CombatPhase) turnSystem.StartNewRound();
-            events.Publish(new PhaseChanged(phase, true));
+            GetCurrentPhase()?.Exit();
+
+            CurrentPhase++;
+
+            if (CurrentPhase > Phase.Result)
+                CurrentPhase = Phase.Result;
+            else
+            {
+                GetCurrentPhase()?.Enter();
+                events.Publish(new PhaseChanged(CurrentPhase));
+            }
         }
 
-        private void ExitPhase(ICombatPhase phase)
+        public IPassivePhase GetCurrentPhase() => CurrentPhase switch
         {
-            phase.Exit();
-            events.Publish(new PhaseChanged(phase, false));
+            Phase.None => null,
+            Phase.Placement => placement,
+            Phase.Combat => combat,
+            Phase.Result => null,
+            _ => throw new Exception("Invalid phase")
+        };
+
+        private void OnHover(Vector2Int pos, HighlightType type)
+        {
+            if (GetCurrentPhase() is IInteractivePhase interactive)
+                interactive.UpdateHover(pos, type);
         }
 
-        private void OnHover(Vector2Int position, HighlightType type)
+        private void OnClick(Vector2Int pos, SelectionType type)
         {
-            if (TryGetCurrentPhase(out var phase))
-                phase.UpdateHover(position, type);
-        }
-
-        private void OnClick(Vector2Int position, SelectionType type)
-        {
-            if (TryGetCurrentPhase(out var phase))
-                phase.UpdateClick(position, type);
+            if (GetCurrentPhase() is IInteractivePhase interactive)
+                interactive.UpdateClick(pos, type);
         }
 
         private void OnReset()
         {
-            if (TryGetCurrentPhase(out var phase))
-                phase.Reset();
-        }
-
-        private bool TryGetCurrentPhase(out ICombatPhase phase)
-        {
-            phase = currentIndex < phases.Length ? phases[currentIndex] : null;
-            return phase != null;
-        }
-
-        public void AdvancePhase()
-        {
-            if (!TryGetCurrentPhase(out var currentPhase)) return;
-
-            ExitPhase(currentPhase);
-            currentIndex++;
-
-            if (TryGetCurrentPhase(out var nextPhase))
-                EnterPhase(nextPhase);
+            if (GetCurrentPhase() is IInteractivePhase interactive)
+                interactive.Reset();
         }
     }
 }

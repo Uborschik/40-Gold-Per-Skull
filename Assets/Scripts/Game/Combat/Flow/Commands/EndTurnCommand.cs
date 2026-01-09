@@ -1,16 +1,16 @@
-﻿using Game.Combat.Flow.Phases;
+﻿using Game.Combat.Application.Turns;
 
 namespace Game.Combat.Flow.Commands
 {
     public class EndTurnCommand : ICommand
     {
-        private CombatPhase combatPhase;
+        private readonly BattleCyclic battleCyclic;
 
-        public EndTurnCommand(CombatPhase combatPhase)
+        public EndTurnCommand(BattleCyclic battleCyclic)
         {
-            this.combatPhase = combatPhase;
+            this.battleCyclic = battleCyclic;
         }
 
-        public void Execute() => combatPhase.EndTurn();
+        public void Execute() => battleCyclic.RequestEndPlayerTurn();
     }
 }

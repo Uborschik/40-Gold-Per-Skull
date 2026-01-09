@@ -5,10 +5,10 @@ namespace Game.Combat.Application.UseCases
 {
     public class EndTurnUseCase
     {
-        private readonly TurnQueue turnQueue;
+        private readonly TurnQueueFactory turnQueue;
         private readonly IEventBus events;
 
-        public EndTurnUseCase(TurnQueue turnQueue, IEventBus events)
+        public EndTurnUseCase(TurnQueueFactory turnQueue, IEventBus events)
         {
             this.turnQueue = turnQueue;
             this.events = events;
@@ -16,8 +16,8 @@ namespace Game.Combat.Application.UseCases
 
         public void Execute()
         {
-            turnQueue.Advance();
-            events.Publish(new TurnChanged(turnQueue.Current));
+        //    turnQueue.Advance();
+        //    events.Publish(new TurnChanged(turnQueue.Current));
         }
     }
 }

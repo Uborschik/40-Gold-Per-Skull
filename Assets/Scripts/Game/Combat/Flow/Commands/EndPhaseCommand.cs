@@ -2,13 +2,13 @@ namespace Game.Combat.Flow.Commands
 {
     public class EndPhaseCommand : ICommand
     {
-        private readonly CombatFlow combatFlow;
+        private readonly CombatFlow flow;
 
-        public EndPhaseCommand(CombatFlow combatFlow)
+        public EndPhaseCommand(CombatFlow flow)
         {
-            this.combatFlow = combatFlow;
+            this.flow = flow;
         }
 
-        public void Execute() => combatFlow.AdvancePhase();
+        public void Execute() => flow.Advance();
     }
 }

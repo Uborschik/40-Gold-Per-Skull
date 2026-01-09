@@ -8,7 +8,7 @@ using System;
 
 namespace Game.Combat.Infrastructure.Systems
 {
-    public class GridViewUpdater : IEventListener<UnitMoved>, IEventListener<UnitSelected>, IDisposable
+    public class GridViewUpdater : IDisposable
     {
         private readonly IEventBus eventBus;
         private readonly GridView gridView;
@@ -20,24 +20,17 @@ namespace Game.Combat.Infrastructure.Systems
             this.gridView = gridView;
             this.cellRegistry = cellRegistry;
 
-            eventBus.Subscribe<UnitMoved>(this);
-            eventBus.Subscribe<UnitSelected>(this);
+            eventBus.Subscribe<UnitSelected>(SetSelectionType);
         }
 
         public void Dispose()
         {
-            eventBus.Unsubscribe<UnitMoved>(this);
-            eventBus.Unsubscribe<UnitSelected>(this);
+            eventBus.Unsubscribe<UnitSelected>(SetSelectionType);
         }
 
-        public void OnEvent(UnitMoved evt)
+        public void SetSelectionType(UnitSelected evt)
         {
-            evt.Unit.SetOrder(cellRegistry.Height - evt.NewPosition.y);
-        }
-
-        public void OnEvent(UnitSelected evt)
-        {
-            var type = evt.Unit.Team == Team.Player ? SelectionType.AllyUnit : SelectionType.EnemyUnit;
+            var type = evt.Unit.Team == Team.Player ? SelectionType.Ally : SelectionType.Enemy;
             gridView.PaintInputCellSelection(evt.Unit.Position.ToCenter(), type);
         }
     }

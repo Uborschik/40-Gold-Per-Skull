@@ -3,11 +3,12 @@ using Game.Combat.Entities.Units;
 using Game.Combat.Infrastructure.Input;
 using Game.Combat.Infrastructure.View;
 using Game.Utils;
+using System.Linq;
 using UnityEngine;
 
 namespace Game.Combat.Flow.Phases
 {
-    public class PlacementPhase : ICombatPhase
+    public class PlacementPhase : IInteractivePhase
     {
         private readonly GridView gridView;
         private readonly BoundsInt placementArea;
