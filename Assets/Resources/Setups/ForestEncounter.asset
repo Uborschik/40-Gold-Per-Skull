@@ -17,7 +17,7 @@ MonoBehaviour:
     GridHeight: 20
     PlacementArea:
       m_Position: {x: 0, y: 0, z: 0}
-      m_Size: {x: 3, y: 20, z: 1}
+      m_Size: {x: 6, y: 20, z: 1}
   UnitFactoryData:
     TeamData:
     - Team: 0

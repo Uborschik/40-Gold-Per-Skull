@@ -78,46 +78,38 @@ public class PlayerTurnState : ITurnState
 
     private HashSet<Vector2Int> CalculateMovableArea(Unit unit)
     {
-        var movableArea = new HashSet<Vector2Int>();
+        if (!unit.IsAlive || unit.Speed <= 0)
+            return new HashSet<Vector2Int>();
+
         var startPos = unit.Position.ToInt();
-        float maxCost = unit.Speed;
+        var radius = unit.Speed + 0.5f;
+        var radiusSq = radius * radius;
 
-        var queue = new Queue<(Vector2Int pos, float cost)>();
-        var costs = new Dictionary<Vector2Int, float>();
+        var top = Mathf.CeilToInt(startPos.y + radius);
+        var right = Mathf.FloorToInt(startPos.x + radius);
+        var bottom = Mathf.CeilToInt(startPos.y - radius);
+        var left = Mathf.FloorToInt(startPos.x - radius);
 
-        queue.Enqueue((startPos, 0f));
-        costs[startPos] = 0f;
 
-        while (queue.Count > 0)
+        var movableArea = new HashSet<Vector2Int>();
+
+        for (int y = bottom; y <= top; y++)
         {
-            var (currentPos, currentCost) = queue.Dequeue();
-
-            if (currentCost >= maxCost) continue;
-
-            foreach (var direction in Directions2D.eightDirections)
+            for (int x = left; x <= right; x++)
             {
-                var nextPos = currentPos + direction;
+                if (x == startPos.x && y == startPos.y) continue;
 
-                var cell = cellRegistry.GetCell(nextPos);
+                var dx = x - startPos.x;
+                var dy = y - startPos.y;
+
+                if (dx * dx + dy * dy > radiusSq) continue;
+
+                var pos = new Vector2Int(x, y);
+                var cell = cellRegistry.GetCell(pos);
+
                 if (cell == null || !cell.IsWalkable) continue;
-                if (unitRegistry.TryGetUnit(nextPos, out _)) continue;
 
-                float stepCost = (Mathf.Abs(direction.x) == 1 && Mathf.Abs(direction.y) == 1)
-                    ? 1.5f
-                    : 1.0f;
-
-                float newCost = currentCost + stepCost;
-
-                if (costs.TryGetValue(nextPos, out float existingCost) && newCost >= existingCost)
-                    continue;
-
-                costs[nextPos] = newCost;
-                queue.Enqueue((nextPos, newCost));
-
-                if (nextPos != startPos)
-                {
-                    movableArea.Add(nextPos);
-                }
+                movableArea.Add(pos);
             }
         }
 

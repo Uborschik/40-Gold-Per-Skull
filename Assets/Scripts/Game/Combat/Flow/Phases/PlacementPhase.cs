@@ -33,7 +33,7 @@ namespace Game.Combat.Flow.Phases
         public void Enter()
         {
             IsComplete = false;
-            gridView.PaintArea(placementArea);
+            gridView.PaintArea(placementArea.AllCells());
         }
 
         public void UpdateHover(Vector2Int position, HighlightType type)

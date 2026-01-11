@@ -24,11 +24,14 @@ namespace Game.Utils
                     yield return new Vector3Int(x, y);
         }
 
-        public static IEnumerable<Vector3Int> AllCells(this BoundsInt area)
+        public static HashSet<Vector2Int> AllCells(this BoundsInt area)
         {
+            var set = new HashSet<Vector2Int>();
+
             for (int y = area.min.y; y < area.max.y; y++)
                 for (int x = area.min.x; x < area.max.x; x++)
-                    yield return new Vector3Int(x, y);
+                    set.Add(new Vector2Int(x, y));
+            return set;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Game.Combat.Infrastructure.Factories
             var unit = objectResolver.Instantiate(data.Prefab, parent);
             var health = new Health(10);
             var ap = new ActionPoints(1);
-            unit.Initialize(unitData.Name, health, ap, 3, 5, stats, team, position.ToCenter());
+            unit.Initialize(unitData.Name, health, ap, 3, 6, stats, team, position.ToCenter());
             unitRegistry.TryAddUnit(position, unit);
             cellRegistry.TrySetBlocked(position, true);
         }

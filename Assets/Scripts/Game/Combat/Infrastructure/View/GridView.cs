@@ -12,14 +12,15 @@ namespace Game.Combat.Infrastructure.View
     {
         [Inject] private readonly CellRegistry cellRegistry;
 
+        [Header("Tilemaps")]
         [SerializeField] private Tilemap mainTilemap;
         [SerializeField] private Tilemap selectionTilemap;
-        [SerializeField] private Tilemap movableTilemap;
 
+        [Header("Tiles")]
         [SerializeField] private TileBase groundTile;
         [SerializeField] private TileBase selectionTile;
-        [SerializeField] private TileBase moveableTile;
 
+        [Header("Objects")]
         [SerializeField] private HighlightSelectionView highlightSelection;
         [SerializeField] private InputCellSelectionView inputCellSelection;
         [SerializeField] private TurnCellSelectionView turnCellSelection;
@@ -32,19 +33,11 @@ namespace Game.Combat.Infrastructure.View
             }
         }
 
-        public void PaintArea(BoundsInt area)
-        {
-            foreach (var position in area.AllCells())
-            {
-                selectionTilemap.SetTile(position, selectionTile);
-            }
-        }
-
-        public void PaintMovableArea(HashSet<Vector2Int> area)
+        public void PaintArea(HashSet<Vector2Int> area)
         {
             foreach (var position in area)
             {
-                movableTilemap.SetTile(position.To3Int(), moveableTile);
+                selectionTilemap.SetTile(position.To3Int(), selectionTile);
             }
         }
 
@@ -54,7 +47,6 @@ namespace Game.Combat.Infrastructure.View
 
         public void ClearGrid() => mainTilemap.ClearAllTiles();
         public void ClearArea() => selectionTilemap.ClearAllTiles();
-        public void ClearMovableArea() => movableTilemap.ClearAllTiles();
         public void ClearHighlight() => highlightSelection.Hide();
         public void ClearSelection() => inputCellSelection.Hide();
     }

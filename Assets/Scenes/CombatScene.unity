@@ -686,7 +686,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -1803314165
   m_SortingLayer: 1
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -746,7 +746,6 @@ MonoBehaviour:
   - {fileID: 1258995191}
   setupAsset: {fileID: 11400000, guid: f83e38e4444820d40b42671e1a9ed215, type: 2}
   mainCamera: {fileID: 519420031}
-  phaseBtn: {fileID: 1258995193}
 --- !u!4 &1048211727
 Transform:
   m_ObjectHideFlags: 0
@@ -1106,10 +1105,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Unity::Game.Unity.Combat.Views.GridView
   mainTilemap: {fileID: 7446024386893373106}
   selectionTilemap: {fileID: 3226331058070165552}
-  movableTilemap: {fileID: 936078615}
   groundTile: {fileID: 11400000, guid: 0bac500eb21e8af468da635d9c115aaa, type: 2}
   selectionTile: {fileID: 11400000, guid: 5cdfb6159cae4ac40bd7874cfd4ba6ec, type: 2}
-  moveableTile: {fileID: 11400000, guid: ca0bbc90f8048f5419353fd1ff5b64c0, type: 2}
   highlightSelection: {fileID: 3696697686186505731}
   inputCellSelection: {fileID: 7393918926429164825}
   turnCellSelection: {fileID: 371372755}
@@ -1331,6 +1328,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4393887445244151217}
   - {fileID: 3750948066496938789}
   - {fileID: 9042632380297307018}
   - {fileID: 936078617}
@@ -1418,7 +1416,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3711705624952164877}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1426,7 +1424,7 @@ Transform:
   - {fileID: 4042876142015960962}
   - {fileID: 5265017784114675474}
   - {fileID: 371372752}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 4013387181467071110}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &4473901265015596009
 TilemapRenderer:
@@ -1671,5 +1669,4 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 519420032}
   - {fileID: 1410390333}
-  - {fileID: 4393887445244151217}
   - {fileID: 4013387181467071110}
